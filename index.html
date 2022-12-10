@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>수학의 신</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <link
+      href="https://cdn.jsdelivr.net/npm/daisyui@2.39.0/dist/full.css"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body>
+    <div id="app">
+      <div class="flex justify-center my-8" v-show="alert">
+        <div v-if="isAnswer === 'ready'" class="badge badge-warning badge-lg">
+          문제를 풀어주세요 🧑‍🏫
+        </div>
+        <div v-else-if="isAnswer" class="badge badge-success badge-lg">
+          맞았습니다 😀
+        </div>
+        <div v-else class="badge badge-error badge-lg">틀렸습니다 🥵</div>
+      </div>
+
+      <div class="divider">Score</div>
+      <div class="text-center">
+        <p class="text-6xl">{{ score }}</p>
+      </div>
+
+      <div class="flex justify-center">
+        <button class="btn btn-outline btn-xs btn-error mt-4" @click="reset()">
+          Reset
+        </button>
+      </div>
+
+      <div class="divider">Question</div>
+      <div class="text-center">
+        <p class="text-9xl">{{ x }} + {{ y }}</p>
+      </div>
+
+      <div class="flex justify-center mt-10">
+        <input
+          type="number"
+          placeholder="정답 입력 후 엔터 또는 [확인] 클릭"
+          autofocus
+          class="input input-bordered input-lg w-full max-w-xs"
+          v-model="input"
+          @keydown.enter="checkAnswer()"
+        />
+        <button class="btn btn-lg" @click="checkAnswer()">확인</button>
+      </div>
+      <div class="divider">History</div>
+      <div class="flex justify-center">
+        <ul>
+          <li v-for="log in history" class="badge badge-outlin m-1">
+            {{ log }}
+          </li>
+        </ul>
+      </div>
+    </div>
+  </body>
+</html>
+
+<script>
+  const { createApp } = Vue;
+
+  createApp({
+    data() {
+      return {
+        x: 0,
+        y: 0,
+        answer: 0,
+        score: 0,
+        input: "",
+        log: "",
+        history: [],
+        isAnswer: "ready",
+        alert: true,
+      };
+    },
+    methods: {
+      randNumber() {
+        return Math.floor(Math.random() * 10);
+      },
+      makeQuestion() {
+        this.x = this.randNumber();
+        this.y = this.randNumber();
+        this.answer = this.x + this.y;
+      },
+      checkAnswer() {
+        this.alert = true;
+        let result = "✅";
+        if (this.answer == this.input) {
+          this.isAnswer = true;
+          result = "✅";
+          this.score++;
+        } else {
+          this.isAnswer = false;
+          result = "❌";
+        }
+        this.log = `${this.x} + ${this.y} = ${this.input} ${[result]}`;
+        this.history.push(this.log);
+        this.makeQuestion();
+        this.input = "";
+      },
+      reset() {
+        this.makeQuestion();
+        this.score = 0;
+        this.input = "";
+        this.log = "";
+        this.history = [];
+        this.isAnswer = "ready";
+      },
+    },
+    created() {
+      this.makeQuestion();
+    },
+  }).mount("#app");
+</script>
